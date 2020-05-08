@@ -1,0 +1,38 @@
+version: '3'
+
+networks:
+  internal:
+    driver: bridge
+    
+services:
+  php:
+    image: yiisoftware/yii2-php:7.1-apache
+    container_name: yiitest_app
+    volumes:
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      - ./:/app:delegated
+    ports:
+      - '8000:80'
+    networks:
+      - internal
+    depends_on:
+      - 'db'
+   # Контейнер с базой данных
+  db:
+    image: postgres:10.3-alpine
+    container_name: yiitest_db
+    restart: unless-stopped
+    # Показываем наружу порт
+    ports:
+      - "5433:5432"
+    # Задаем параметры для инициализации БД
+    environment:
+      - POSTGRES_DB=yiitest
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    # Линкуем внешнюю папку для хранения БД
+    volumes:
+      - "./postgres:/var/lib/postgresql/data"
+    networks:
+      - internal
