@@ -1,14 +1,21 @@
 <?php
-use yii\helpers\Url;
-use yii\helpers\Html;
+
 use app\assets\AppAsset;
+use yii\helpers\Html;
+
 AppAsset::register($this);
 ?>
-
+<!--
+author: W3layouts
+author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
 <head>
+    <base href="/">
     <meta charset="<?= Yii::$app->charset ?>">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
@@ -83,10 +90,7 @@ AppAsset::register($this);
 </div>
 <!-- //header -->
 
-<!-- banner -->
-<div class="banner">
-    <?= $this->render('//layouts/inc/sidebar') ?>
-    <?= $content ?>
+<?= $content ?>
 
 <!-- newsletter -->
 <div class="newsletter">
