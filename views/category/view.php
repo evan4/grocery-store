@@ -7,7 +7,9 @@ use yii\helpers\Url;
 <div class="products-breadcrumb">
     <div class="container">
         <ul>
-            <li><i class="fa fa-home" aria-hidden="true"></i><a href="<?= Url::home() ?>">Home</a><span>|</span></li>
+            <li>
+                <i class="fa fa-home" aria-hidden="true"></i><a href="<?= Url::home() ?>">Home</a><span>|</span>
+            </li>
             <li><?= $category->title ?></li>
         </ul>
     </div>
