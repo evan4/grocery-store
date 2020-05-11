@@ -1,3 +1,9 @@
+<?php
+
+use yii\helpers\Html;
+use yii\helpers\Url;
+?>
+
 <!-- banner -->
 <div class="banner">
     <?= $this->render('//layouts/inc/sidebar') ?>
@@ -79,14 +85,14 @@
                 <div class="hover14 column">
                     <div class="agile_top_brand_left_grid">
                         <div class="agile_top_brand_left_grid_pos">
-                            <?= \yii\helpers\Html::img('@web/images/offer.png', ['alt' => 'offer', 'class' => 'img-responsive']) ?>
+                            <?= Html::img('@web/images/offer.png', ['alt' => 'offer', 'class' => 'img-responsive']) ?>
                         </div>
                         <div class="agile_top_brand_left_grid1">
                             <figure>
                                 <div class="snipcart-item block" >
                                     <div class="snipcart-thumb">
-                                        <a href="<?= \yii\helpers\Url::to(['product/view', 'id' => $offer->id]) ?>">
-                                            <?= \yii\helpers\Html::img("@web/products/{$offer->img}", ['alt' => $offer->title]) ?>
+                                        <a href="<?= Url::to(['product/view', 'id' => $offer->id]) ?>">
+                                            <?= Html::img("@web/products/{$offer->img}", ['alt' => $offer->title]) ?>
                                         </a>
                                         <p><?= $offer->title ?></p>
                                         <h4>

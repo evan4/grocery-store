@@ -1,5 +1,5 @@
 <?php
-
+use yii\widgets\LinkPager;
 use yii\helpers\Html;
 use yii\helpers\Url;
 ?>
@@ -123,6 +123,14 @@ use yii\helpers\Url;
                 </div>
                 <?php endforeach; ?>
                 <div class="clearfix"> </div>
+                <div class="col-md-12">
+              
+                <?php 
+                  // отображаем ссылки на страницы
+                echo LinkPager::widget([
+                    'pagination' => $pages,
+                ]); ?>
+                </div>
             </div>
             <?php else: ?>
                 <div class="w3ls_w3l_banner_nav_right_grid1">
