@@ -28,7 +28,6 @@ class AppAsset extends AssetBundle
         'js/move-top.js',
         'js/easing.js',
         'js/jquery.flexslider.js',
-        'js/minicart.js',
         'js/okzoom.js',
         'js/main.js',
         

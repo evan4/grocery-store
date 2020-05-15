@@ -3,6 +3,7 @@
 use app\assets\AppAsset;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\bootstrap\Modal;
 
 AppAsset::register($this);
 ?>
@@ -39,13 +40,31 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         </form>
     </div>
     <div class="product_list_header">
-        <form action="#" method="post" class="last">
-            <fieldset>
-                <input type="hidden" name="cmd" value="_cart" />
-                <input type="hidden" name="display" value="1" />
-                <input type="submit" name="submit" value="View your cart" class="button" />
-            </fieldset>
-        </form>
+        <?php
+        Modal::begin([
+            'header' => '<h4 class="modal-title">Корзина</h4>',
+            'toggleButton' => [
+                'tag' => 'button',
+                'class' => 'btn',
+                'label' => '$0'
+            ],
+            'footer' => Html::button('Продолжить покупки', [
+                    'class' => 'btn btn-default',
+                    'data-dismiss' => 'modal'
+                ])
+                . Html::a('ОФормить заказ', ['cart/view'],
+                ['class' => 'btn btn-success']
+                )
+                . Html::button('Очистить корзину', [
+                    'class' => 'btn btn-danger',
+                    'data-dismiss' => 'modal'
+                ])
+        ]);
+        
+        echo '0';
+        
+        Modal::end();
+        ?>
     </div>
     <div class="w3l_header_right">
         <ul>

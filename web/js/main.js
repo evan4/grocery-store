@@ -41,23 +41,34 @@ jQuery(document).ready(function($) {
         border: "1px solid black",
         shadow: "0 0 5px #000"
     });
-});
 
-paypal.minicart.render();
+    $.ajaxSetup({
+        dataType: "json"
+    });
 
-paypal.minicart.cart.on('checkout', function (evt) {
-    var items = this.items(),
-        len = items.length,
-        total = 0,
-        i;
+    $('.add-to-cart').on('click', function(e) {
+        e.preventDefault();
+        const id = +$(this).data('id');
+        
+        if(id > 0) {
+           const data = {
+                id
+            };
 
-    // Count the number of each item in the cart
-    for (i = 0; i < len; i++) {
-        total += items[i].get('quantity');
-    }
-
-    if (total < 3) {
-        alert('The minimum order quantity is 3. Please add more to your shopping cart before checking out');
-        evt.preventDefault();
-    }
+            $.ajax({
+                url: 'cart/add',
+                method: "GET",
+                data
+            })
+            .done(function (res) {
+                
+            })
+            .fail(function (error) {
+                let res = {
+                    'error': 'Произошла ошибка. Попробуйте еще раз'
+                }
+                console.log(res);
+            });
+        }
+    })
 });
