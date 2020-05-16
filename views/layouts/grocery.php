@@ -37,7 +37,9 @@ AppAsset::register($this);
     <div class="product_list_header">
         <?php
         $session = Yii::$app->session;
-        $sum = $session->has('cart-sum') ?? 0;
+           
+        $sum = $session->has('cart-sum') ? $session->get('cart-sum') :  0;
+        
         Modal::begin([
             'header' => '<h4 class="modal-title">Корзина</h4>',
             'toggleButton' => [
@@ -53,6 +55,7 @@ AppAsset::register($this);
                 ['class' => 'btn btn-success']
                 )
                 . Html::button('Очистить корзину', [
+                    'id' => 'clearCart',
                     'class' => 'btn btn-danger',
                     'data-dismiss' => 'modal'
                 ])

@@ -72,17 +72,61 @@ jQuery(document).ready(function($) {
             });
         }
     });
+
+    $modal = $('#w0');
+    $modal.find('.modal-body').on('click', '.del-item', function () {
+        const id = +$(this).data('id');
+
+        if(id > 0) {
+            const data = {
+                 id
+             };
+ 
+             $.ajax({
+                 url: 'cart/remove-item',
+                 data
+             })
+             .done(function (res) {
+                 if(!res) alert('Произошла ошибка. Попробуйте еще раз');
+ 
+                 showCart(res);
+             })
+             .fail(function (error) {
+                 let res = {
+                     'error': 'Произошла ошибка. Попробуйте еще раз'
+                 }
+                 console.log(res);
+             });
+         }
+    })
     
+    $('#clearCart').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: 'cart/clear-cart'
+        })
+        .done(function (res) {
+            showCart('')
+        })
+        .fail(function (error) {
+            let res = {
+                'error': 'Произошла ошибка. Попробуйте еще раз'
+            }
+            console.log(res);
+        });
+    })
 });
 
 function showCart(cart) {
 
     $modal = $('#w0');
     $modal.find('.modal-body').html(cart);
-    $modal.modal();
-
+    if(cart){
+        $modal.modal();
+    }
+    
     $sum = $('#cart-sum').text();
-    $cartSum = $sum ? $sum : 0;
+    $cartSum = $sum ? $sum : '$0';
 
-    if($cartSum) $('.cart-sum').text($cartSum);
+    $('.cart-sum').text($cartSum);
 }

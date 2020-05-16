@@ -12,9 +12,9 @@ class Cart extends Model
   {
 
     $session = Yii::$app->session;
-    unset($session['cart']);
+   /*  unset($session['cart']);
     unset($session['cart-sum']);
-    unset($session['cart-qty']);
+    unset($session['cart-qty']); */
     
     if(isset($session['cart'][$product->id])){
       $_SESSION['cart'][$product->id]['qty'] = $session['cart'][$product->id]['qty'] + $qty;
@@ -33,7 +33,7 @@ class Cart extends Model
       $session->set('cart-qty', $qty);
     }
     
-    $sum = $session->has('cart-sum') ? $session->get('cart-sum') : 0;
+    $sum = 0;
    
     foreach ($session['cart'] as $product) {
       $sum += (float)$product['price'] * $product['qty'];
@@ -41,7 +41,26 @@ class Cart extends Model
 
     $session->set('cart-sum', $sum);
 
-    
+  }
 
+  public function deleteItemCart($id)
+  {
+    $session = Yii::$app->session;
+    $product = $session['cart'][$id];
+
+    $session->set('cart-qty', $session->get('cart-qty') + $product['qty']);
+
+    $sum = $session->get('cart-sum') - ((float)$product['price'] * $product['qty']);
+
+    $session->set('cart-sum', $sum);
+    unset($_SESSION['cart'][$id]);
+  }
+
+  public function clearCart()
+  {
+    $session = Yii::$app->session;
+    $session->remove('cart');
+    $session->set('cart-qty',0);
+    $session->set('cart-sum', 0);
   }
 }
