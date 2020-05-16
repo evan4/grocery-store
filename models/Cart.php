@@ -12,8 +12,9 @@ class Cart extends Model
   {
 
     $session = Yii::$app->session;
-   /*  unset($session['cart']);
-    unset($session['cart-sum']); */
+    unset($session['cart']);
+    unset($session['cart-sum']);
+    unset($session['cart-qty']);
     
     if(isset($session['cart'][$product->id])){
       $_SESSION['cart'][$product->id]['qty'] = $session['cart'][$product->id]['qty'] + $qty;
@@ -21,7 +22,7 @@ class Cart extends Model
       $_SESSION['cart'][$product->id] = [
           'title' => $product->title,
           'price' => $product->price,
-          'image' => $product->img,
+          'img' => $product->img,
           'qty' => $qty
       ];
     }

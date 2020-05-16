@@ -7,12 +7,7 @@ use yii\bootstrap\Modal;
 
 AppAsset::register($this);
 ?>
-<!--
-author: W3layouts
-author URL: http://w3layouts.com
-License: Creative Commons Attribution 3.0 Unported
-License URL: http://creativecommons.org/licenses/by/3.0/
--->
+
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
@@ -41,12 +36,14 @@ License URL: http://creativecommons.org/licenses/by/3.0/
     </div>
     <div class="product_list_header">
         <?php
+        $session = Yii::$app->session;
+        $sum = $session->has('cart-sum') ?? 0;
         Modal::begin([
             'header' => '<h4 class="modal-title">Корзина</h4>',
             'toggleButton' => [
                 'tag' => 'button',
-                'class' => 'btn',
-                'label' => '$0'
+                'class' => 'button',
+                'label' => "<span class='cart-sum'>$$sum</span>"
             ],
             'footer' => Html::button('Продолжить покупки', [
                     'class' => 'btn btn-default',
@@ -61,7 +58,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 ])
         ]);
         
-        echo '0';
+        echo $this->context->renderPartial('/cart/cart-modal', [
+            'cart' => [
+                'products' => $session->get('cart'),
+                'cart-qty' => $session->get('cart-qty'),
+                'cart-sum' => $session->get('cart-sum'),
+            ]
+        ]);
         
         Modal::end();
         ?>
@@ -90,7 +93,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <div class="logo_products">
     <div class="container">
         <div class="w3ls_logo_products_left">
-            <h1><a href="<?= \yii\helpers\Url::home() ?>"><span>Grocery</span> Store</a></h1>
+            <h1><a href="<?= Url::home() ?>"><span>Grocery</span> Store</a></h1>
         </div>
         <div class="w3ls_logo_products_left1">
             <ul class="special_items">

@@ -22,7 +22,7 @@ class CartController extends AppController
     $cart = new Cart();
     $cart->addToCart($product);
     $cart = [
-      'cart' => $session->get('cart'),
+      'products' => $session->get('cart'),
       'cart-qty' => $session->get('cart-qty'),
       'cart-sum' => $session->get('cart-sum'),
     ];

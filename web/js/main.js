@@ -42,9 +42,9 @@ jQuery(document).ready(function($) {
         shadow: "0 0 5px #000"
     });
 
-    $.ajaxSetup({
+    /* $.ajaxSetup({
         dataType: "json"
-    });
+    }); */
 
     $('.add-to-cart').on('click', function(e) {
         e.preventDefault();
@@ -57,11 +57,12 @@ jQuery(document).ready(function($) {
 
             $.ajax({
                 url: 'cart/add',
-                method: "GET",
                 data
             })
             .done(function (res) {
-                
+                if(!res) alert('Произошла ошибка. Попробуйте еще раз');
+
+                showCart(res);
             })
             .fail(function (error) {
                 let res = {
@@ -70,5 +71,18 @@ jQuery(document).ready(function($) {
                 console.log(res);
             });
         }
-    })
+    });
+    
 });
+
+function showCart(cart) {
+
+    $modal = $('#w0');
+    $modal.find('.modal-body').html(cart);
+    $modal.modal();
+
+    $sum = $('#cart-sum').text();
+    $cartSum = $sum ? $sum : 0;
+
+    if($cartSum) $('.cart-sum').text($cartSum);
+}
