@@ -79,4 +79,17 @@ class CartController extends AppController
     return $this->redirect(Yii::$app->request->referrer);
   }
 
+  public function actionView()
+  {
+    $session = Yii::$app->session;
+    $cart = [
+      'products' => $session->get('cart'),
+      'cart-qty' => $session->get('cart-qty'),
+      'cart-sum' => $session->get('cart-sum'),
+    ];
+    $this->setMeta(
+      "Оформление заказа: ". Yii::$app->name
+    );
+    return $this->render('checkout', compact('cart'));
+  }
 }
