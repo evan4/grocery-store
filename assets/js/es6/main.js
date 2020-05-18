@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
         $('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
     });
 
-    var navoffeset=$(".agileits_header").offset().top;
+    const navoffeset=$(".agileits_header").offset().top;
     $(window).scroll(function(){
         var scrollpos=$(window).scrollTop();
         if(scrollpos >=navoffeset){
@@ -42,10 +42,6 @@ jQuery(document).ready(function($) {
         shadow: "0 0 5px #000"
     });
 
-    /* $.ajaxSetup({
-        dataType: "json"
-    }); */
-
     $('.add-to-cart').on('click', function(e) {
         e.preventDefault();
         const id = +$(this).data('id');
@@ -73,7 +69,7 @@ jQuery(document).ready(function($) {
         }
     });
 
-    $modal = $('#w0');
+    const $modal = $('#w0');
     $modal.find('.modal-body').on('click', '.del-item', function () {
         const id = +$(this).data('id');
 
@@ -114,18 +110,20 @@ jQuery(document).ready(function($) {
             }
             console.log(res);
         });
-    })
+    });
+
+
 });
 
 function showCart(cart) {
 
-    $modal = $('#w0');
+    const $modal = $('#w0');
     $modal.find('.modal-body').html(cart);
     if(cart){
         $modal.modal();
     }
     
-    $sum = $('#cart-sum').text();
+    const $sum = $('#cart-sum').text();
     $cartSum = $sum ? $sum : '$0';
 
     $('.cart-sum').text($cartSum);

@@ -10,7 +10,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'assets/js/main.js': 'assets/js/es6/main.js'
+          'assets/js/compile/main.js': 'assets/js/es6/main.js'
         }
       }
     },
@@ -19,13 +19,13 @@ module.exports = function(grunt) {
         sourceMap: true
       },
       build: {
-        src: 'assets/js/es6/main.js',
+        src: 'assets/js/compile/main.js',
         dest: 'web/js/main.min.js'
       }
     },
     watch: {
       scripts: {
-          files: ['assets/js/*.js'],
+          files: ['assets/js/es6/*.js'],
           tasks: ['babel', 'uglify'],
           options: {
               spawn: false,
