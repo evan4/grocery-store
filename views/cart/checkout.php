@@ -42,7 +42,7 @@ use yii\helpers\Html;
                     </thead>
                     <tbody>
                     <?php $i = 1; foreach($cart['products'] as $id => $item): ?>
-                    <tr>
+                    <tr data-id="<?=$id;?>">
                         <td class="invert"><?= $i ?></td>
                         <td class="invert-image">
                             <a href="<?= Url::to(['product/view', 'id' => $id]) ?>">
@@ -62,9 +62,8 @@ use yii\helpers\Html;
                         <td class="invert">$<?= $item['price'] ?></td>
                         <td class="invert">
                             <div class="rem">
-                                <a class="removeItem" data-id="<?=$id;?>"></a>
+                                <a class="removeItem"></a>
                             </div>
-
                         </td>
                     </tr>
                     <?php $i++; endforeach; ?>
@@ -74,7 +73,7 @@ use yii\helpers\Html;
             <div class="checkout-left">
                 <div class="col-md-4 checkout-left-basket">
                     <h4>Continue to basket</h4>
-                    <ul>
+                    <ul class="total-list">
                         <?php foreach($cart['products'] as $item): ?>
                         <li><?= $item['title'] ?> <i>-</i> <span>$<?= $item['price'] * $item['qty'] ?> </span></li>
                         <?php endforeach; ?>
@@ -129,9 +128,7 @@ use yii\helpers\Html;
                         <a href="payment.html">Make a Payment <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a>
                     </div>
                 </div>
-
                 <div class="clearfix"> </div>
-
             </div>
             <?php else: ?>
                 <h3>Корзина пуста</h3>

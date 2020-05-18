@@ -58,7 +58,7 @@ jQuery(document).ready(function($) {
             .done(function (res) {
                 if(!res) alert('Произошла ошибка. Попробуйте еще раз');
 
-                showCart(res);
+                updateCartDialog(res, true);
             })
             .fail(function (error) {
                 let res = {
@@ -74,25 +74,7 @@ jQuery(document).ready(function($) {
         const id = +$(this).data('id');
 
         if(id > 0) {
-            const data = {
-                 id
-             };
- 
-             $.ajax({
-                 url: 'cart/remove-item',
-                 data
-             })
-             .done(function (res) {
-                 if(!res) alert('Произошла ошибка. Попробуйте еще раз');
- 
-                 showCart(res);
-             })
-             .fail(function (error) {
-                 let res = {
-                     'error': 'Произошла ошибка. Попробуйте еще раз'
-                 }
-                 console.log(res);
-             });
+            deleteItem(id);
          }
     })
     
@@ -102,7 +84,7 @@ jQuery(document).ready(function($) {
             url: 'cart/clear-cart'
         })
         .done(function (res) {
-            showCart('')
+            updateCartDialog('')
         })
         .fail(function (error) {
             let res = {
@@ -112,20 +94,102 @@ jQuery(document).ready(function($) {
         });
     });
 
+    $('.value-plus').on('click', function(){
+        const $tr = $(this).closest("tr");
+        const index = $tr.index();
+
+        const divUpd = $(this).parent().find('.value');
+        const newVal = parseInt(divUpd.text(), 10)+1;
+        divUpd.text(newVal);
+    });
+
+    $('.value-minus').on('click', function(){
+        const $tr = $(this).closest("tr");
+        const index = $tr.index();
+
+        const divUpd = $(this).parent().find('.value');
+        const newVal = parseInt(divUpd.text(), 10)-1;
+
+        if(newVal>=1) {
+            
+            divUpd.text(newVal);
+        }
+    });
+
+    $('.removeItem').on('click', function(e){
+        e.preventDefault();
+
+        const $tr = $(this).closest("tr");
+        const id = +$tr.data('id');
+
+        if(id > 0) {
+            $('.overlay').fadeIn();
+            deleteItem(id)
+            .then(data => {
+                const $list = $('.total-list');
+                const index = $tr.index();
+                let res = 0;
+
+                if(data.indexOf("<td id=\"cart-sum\">") !== -1){
+                    res = data.split("<td id=\"cart-sum\">");
+                    console.log(res[1].charAt(0));
+
+                    res = res[1].split("<")[0];
+                }
+               
+                $tr.fadeOut('slow').remove();
+                
+                $list.find('li')
+                .last().find('span').text(res);
+
+                $list.find('li').eq(index)
+                .fadeOut('slow').remove()
+
+                $('.overlay').fadeOut();
+
+            })
+            .catch(error => {
+                console.log(error)
+                $('.overlay').fadeOut();
+            })
+
+        }
+    });
 
 });
 
-function showCart(cart) {
+function updateCartDialog(cart, open) {
 
     const $modal = $('#w0');
     $modal.find('.modal-body').html(cart);
-    if(cart){
+    if(open){
         $modal.modal();
     }
     
     const $sum = $('#cart-sum').text();
-    $cartSum = $sum ? $sum : '$0';
+    const $cartSum = $sum ? $sum : '$0';
 
     $('.cart-sum').text($cartSum);
 }
 
+function deleteItem(id) {
+    return new Promise((resolve, reject) => {
+        const data = {
+            id
+        };
+
+        $.ajax({
+            url: 'cart/remove-item',
+            data
+        })
+        .done(function (res) {
+            if(!res) alert('Произошла ошибка. Попробуйте еще раз');
+
+            updateCartDialog(res);
+            resolve(res)
+        })
+        .fail(function (error) {
+            reject(error)
+        });
+    });
+}
