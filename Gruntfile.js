@@ -23,7 +23,25 @@ module.exports = function(grunt) {
         dest: 'web/js/main.min.js'
       }
     },
+    cssmin: {
+      options: {
+        mergeIntoShorthands: false,
+        roundingPrecision: -1
+      },
+      target: {
+        files: {
+          'web/css/style.css': ['assets/css/site.css', 'assets/css/style.css']
+        }
+      }
+    },
     watch: {
+      css: {
+        files: 'assets/css/*.css',
+        tasks: ['cssmin'],
+        options: {
+          livereload: true,
+        },
+      },
       scripts: {
           files: ['assets/js/es6/*.js'],
           tasks: ['babel', 'uglify'],
@@ -37,8 +55,9 @@ module.exports = function(grunt) {
    grunt.loadNpmTasks('grunt-babel');
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
   // Default task(s).
-  grunt.registerTask('default', ['babel', 'uglify']);
+  grunt.registerTask('default', ['babel', 'uglify', 'cssmin']);
 
 };
