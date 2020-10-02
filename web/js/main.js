@@ -44,12 +44,11 @@ jQuery(document).ready(function ($) {
     var id = +$(this).data('id');
 
     if (id > 0) {
-      var data = {
-        id: id
-      };
       $.ajax({
         url: 'cart/add',
-        data: data
+        data: {
+          id: id
+        }
       }).done(function (res) {
         if (!res) alert('Произошла ошибка. Попробуйте еще раз');
         updateCartDialog(res, true);
@@ -64,9 +63,15 @@ jQuery(document).ready(function ($) {
   var $modal = $('#w0');
   $modal.find('.modal-body').on('click', '.del-item', function () {
     var id = +$(this).data('id');
+    var index = +$(this).closest('tr').index();
 
     if (id > 0) {
-      deleteItem(id);
+      deleteItem(id).then(function (res) {
+        if ($('.cart-table').length) {
+          console.log(res);
+          removeUtemFromTable(res, index);
+        }
+      });
     }
   });
   $('#clearCart').on('click', function (e) {
@@ -75,6 +80,13 @@ jQuery(document).ready(function ($) {
       url: 'cart/clear-cart'
     }).done(function (res) {
       updateCartDialog('');
+
+      if ($('.cart-table').length) {
+        removeUtemFromTable({
+          cart: {},
+          cartTemplate: res
+        });
+      }
     }).fail(function (error) {
       var res = {
         'error': 'Произошла ошибка. Попробуйте еще раз'
@@ -82,45 +94,30 @@ jQuery(document).ready(function ($) {
       console.log(res);
     });
   });
-  $('.value-plus').on('click', function () {
+  $('.value-plus, .value-minus').on('click', function () {
     var $tr = $(this).closest("tr");
     var index = $tr.index();
+    var id = +$tr.data('id');
     var divUpd = $(this).parent().find('.value');
-    var newVal = parseInt(divUpd.text(), 10) + 1;
-    divUpd.text(newVal);
-  });
-  $('.value-minus').on('click', function () {
-    var $tr = $(this).closest("tr");
-    var index = $tr.index();
-    var divUpd = $(this).parent().find('.value');
-    var newVal = parseInt(divUpd.text(), 10) - 1;
+    var value = $(this).hasClass('value-plus') ? 1 : -1;
+    var newVal = parseInt(divUpd.text(), 10) + value;
 
-    if (newVal >= 1) {
-      divUpd.text(newVal);
+    if (newVal > 0) {
+      changeCartQuantity(id, value, index).then(function (data) {
+        divUpd.text(newVal);
+      });
     }
   });
   $('.removeItem').on('click', function (e) {
     e.preventDefault();
     var $tr = $(this).closest("tr");
     var id = +$tr.data('id');
+    var index = $tr.index();
 
     if (id > 0) {
       $('.overlay').fadeIn();
-      deleteItem(id).then(function (data) {
-        var $list = $('.total-list');
-        var index = $tr.index();
-        var res = 0;
-
-        if (data.indexOf("<td id=\"cart-sum\">") !== -1) {
-          res = data.split("<td id=\"cart-sum\">");
-          console.log(res[1].charAt(0));
-          res = res[1].split("<")[0];
-        }
-
-        $tr.fadeOut('slow').remove();
-        $list.find('li').last().find('span').text(res);
-        $list.find('li').eq(index).fadeOut('slow').remove();
-        $('.overlay').fadeOut();
+      deleteItem(id).then(function (res) {
+        removeUtemFromTable(res, index);
       })["catch"](function (error) {
         console.log(error);
         $('.overlay').fadeOut();
@@ -128,6 +125,25 @@ jQuery(document).ready(function ($) {
     }
   });
 });
+
+function removeUtemFromTable(res, index) {
+  var cart = res.cart,
+      cartTemplate = res.cartTemplate;
+  console.log(cart);
+  console.log(index);
+
+  if (cart['cart-sum'] > 0) {
+    var $list = $('.total-list');
+    $('.timetable_sub tbody tr').eq(index).fadeOut('slow').remove();
+    $list.find('li').last().find('span').text(cart['cart-sum']);
+    $list.find('li').eq(index).fadeOut('slow').remove();
+    $('.overlay').fadeOut();
+  } else {
+    $('.checkout-right').fadeOut();
+    $('.checkout-left').fadeOut();
+    $('.privacy.about').append(cartTemplate);
+  }
+}
 
 function updateCartDialog(cart, open) {
   var $modal = $('#w0');
@@ -144,16 +160,41 @@ function updateCartDialog(cart, open) {
 
 function deleteItem(id) {
   return new Promise(function (resolve, reject) {
-    var data = {
-      id: id
-    };
     $.ajax({
       url: 'cart/remove-item',
-      data: data
+      data: {
+        id: id
+      }
     }).done(function (res) {
       if (!res) alert('Произошла ошибка. Попробуйте еще раз');
-      updateCartDialog(res);
+      updateCartDialog(res.cartTemplate);
       resolve(res);
+    }).fail(function (error) {
+      reject(error);
+    });
+  });
+}
+
+function changeCartQuantity(id, qty, index) {
+  return new Promise(function (resolve, reject) {
+    $.ajax({
+      url: 'cart/change-cart',
+      data: {
+        id: id,
+        qty: qty
+      }
+    }).done(function (res) {
+      if (!res) alert('Произошла ошибка. Попробуйте еще раз');
+      var cart = res.cart,
+          cartTemplate = res.cartTemplate,
+          product = res.product;
+      var sum = product.price * product.qty;
+      var $list = $('.total-list');
+      $list.find('li').eq(index).find('span').text("$".concat(sum)); // total sum
+
+      $list.find('li').last().find('span').text("$".concat(cart['cart-sum']));
+      updateCartDialog(cartTemplate);
+      resolve(cart);
     }).fail(function (error) {
       reject(error);
     });

@@ -10,7 +10,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'assets/js/compile/main.js': 'assets/js/es6/main.js'
+          'web/js/main.js': 'assets/js/es6/main.js'
         }
       }
     },
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
         sourceMap: true
       },
       build: {
-        src: 'assets/js/compile/main.js',
+        src: 'web/js/main.js',
         dest: 'web/js/main.min.js'
       }
     },

@@ -47,13 +47,10 @@ jQuery(document).ready(function($) {
         const id = +$(this).data('id');
         
         if(id > 0) {
-           const data = {
-                id
-            };
 
             $.ajax({
                 url: 'cart/add',
-                data
+                data: {id}
             })
             .done(function (res) {
                 if(!res) alert('Произошла ошибка. Попробуйте еще раз');
@@ -70,13 +67,23 @@ jQuery(document).ready(function($) {
     });
 
     const $modal = $('#w0');
-    $modal.find('.modal-body').on('click', '.del-item', function () {
-        const id = +$(this).data('id');
 
+    $modal.find('.modal-body')
+    .on('click', '.del-item', function () {
+        const id = +$(this).data('id');
+        const index = +$(this).closest('tr').index();
+        
         if(id > 0) {
-            deleteItem(id);
+            deleteItem(id)
+            .then(res => {
+               
+                if($('.cart-table').length){
+                    console.log(res);
+                    removeUtemFromTable(res, index)
+                }
+            })
          }
-    })
+    });
     
     $('#clearCart').on('click', function (e) {
         e.preventDefault();
@@ -84,7 +91,14 @@ jQuery(document).ready(function($) {
             url: 'cart/clear-cart'
         })
         .done(function (res) {
-            updateCartDialog('')
+            updateCartDialog('');
+
+            if($('.cart-table').length){
+                removeUtemFromTable({
+                    cart: {},
+                    cartTemplate: res
+                })
+            }
         })
         .fail(function (error) {
             let res = {
@@ -94,26 +108,23 @@ jQuery(document).ready(function($) {
         });
     });
 
-    $('.value-plus').on('click', function(){
+    $('.value-plus, .value-minus').on('click', function(){
         const $tr = $(this).closest("tr");
         const index = $tr.index();
-
+        const id = +$tr.data('id');
         const divUpd = $(this).parent().find('.value');
-        const newVal = parseInt(divUpd.text(), 10)+1;
-        divUpd.text(newVal);
-    });
+        
+        const value = $(this).hasClass('value-plus') ? 1 : -1;
 
-    $('.value-minus').on('click', function(){
-        const $tr = $(this).closest("tr");
-        const index = $tr.index();
+        const newVal = parseInt(divUpd.text(), 10)+value;
 
-        const divUpd = $(this).parent().find('.value');
-        const newVal = parseInt(divUpd.text(), 10)-1;
-
-        if(newVal>=1) {
-            
-            divUpd.text(newVal);
+        if(newVal>0) {
+            changeCartQuantity(id, value, index)
+            .then(data => {
+                divUpd.text(newVal);
+            })
         }
+        
     });
 
     $('.removeItem').on('click', function(e){
@@ -121,47 +132,54 @@ jQuery(document).ready(function($) {
 
         const $tr = $(this).closest("tr");
         const id = +$tr.data('id');
+        const index = $tr.index();
 
         if(id > 0) {
             $('.overlay').fadeIn();
+
             deleteItem(id)
-            .then(data => {
-                const $list = $('.total-list');
-                const index = $tr.index();
-                let res = 0;
-
-                if(data.indexOf("<td id=\"cart-sum\">") !== -1){
-                    res = data.split("<td id=\"cart-sum\">");
-                    console.log(res[1].charAt(0));
-
-                    res = res[1].split("<")[0];
-                }
-               
-                $tr.fadeOut('slow').remove();
-                
-                $list.find('li')
-                .last().find('span').text(res);
-
-                $list.find('li').eq(index)
-                .fadeOut('slow').remove()
-
-                $('.overlay').fadeOut();
-
+            .then(res => {
+                removeUtemFromTable(res, index);
             })
             .catch(error => {
                 console.log(error)
                 $('.overlay').fadeOut();
             })
-
         }
     });
 
 });
 
+function removeUtemFromTable(res, index) {
+
+    const {cart, cartTemplate } = res;
+    console.log(cart);
+    console.log(index);
+    if(cart['cart-sum'] > 0){
+        const $list = $('.total-list');
+
+        $('.timetable_sub tbody tr').eq(index)
+        .fadeOut('slow').remove();
+        
+        $list.find('li')
+        .last().find('span').text(cart['cart-sum']);
+
+        $list.find('li').eq(index)
+        .fadeOut('slow').remove()
+
+        $('.overlay').fadeOut();
+    }else{
+        $('.checkout-right').fadeOut();
+        $('.checkout-left').fadeOut();
+        $('.privacy.about').append(cartTemplate)
+    }
+}
+
 function updateCartDialog(cart, open) {
 
     const $modal = $('#w0');
     $modal.find('.modal-body').html(cart);
+
     if(open){
         $modal.modal();
     }
@@ -174,18 +192,15 @@ function updateCartDialog(cart, open) {
 
 function deleteItem(id) {
     return new Promise((resolve, reject) => {
-        const data = {
-            id
-        };
 
         $.ajax({
             url: 'cart/remove-item',
-            data
+            data: {id}
         })
         .done(function (res) {
             if(!res) alert('Произошла ошибка. Попробуйте еще раз');
 
-            updateCartDialog(res);
+            updateCartDialog(res.cartTemplate);
             resolve(res)
         })
         .fail(function (error) {
@@ -193,3 +208,36 @@ function deleteItem(id) {
         });
     });
 }
+
+function changeCartQuantity(id, qty, index) {
+    
+    return new Promise((resolve, reject) => {
+        
+        $.ajax({
+            url: 'cart/change-cart',
+            data: {id, qty}
+        })
+        .done(function (res) {
+            if(!res) alert('Произошла ошибка. Попробуйте еще раз');
+
+            const {cart, cartTemplate, product } = res;
+
+            const sum = product.price*product.qty;
+            const $list = $('.total-list');
+            $list.find('li').eq(index).find('span').text(`$${sum}`)
+
+            // total sum
+            $list.find('li')
+                .last().find('span').text(`$${cart['cart-sum']}`);
+
+            updateCartDialog(cartTemplate);
+
+            resolve(cart)
+        })
+        .fail(function (error) {
+            reject(error)
+        });
+    });
+}
+
+

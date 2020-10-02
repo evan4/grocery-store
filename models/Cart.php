@@ -10,7 +10,7 @@ class Cart extends Model
 
   public function addToCart($product, $qty = 1)
   {
-
+    
     $session = Yii::$app->session;
    /*  unset($session['cart']);
     unset($session['cart-sum']);
@@ -28,13 +28,13 @@ class Cart extends Model
     }
     
     if ($session->has('cart-qty')){
-      $session->set('cart-qty', $session->get('cart-qty') + $qty);
+      $session->set('cart-qty', (int)$session->get('cart-qty') + $qty);
     }else{
       $session->set('cart-qty', $qty);
     }
     
     $sum = 0;
-   
+    
     foreach ($session['cart'] as $product) {
       $sum += (float)$product['price'] * $product['qty'];
     }
@@ -47,8 +47,8 @@ class Cart extends Model
   {
     $session = Yii::$app->session;
     $product = $session['cart'][$id];
-
-    $session->set('cart-qty', $session->get('cart-qty') + $product['qty']);
+   
+    $session->set('cart-qty', ((int)$session->get('cart-qty') - $product['qty']));
 
     $sum = $session->get('cart-sum') - ((float)$product['price'] * $product['qty']);
 
